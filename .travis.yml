@@ -1,38 +1,54 @@
 language: node_js
 node_js:
-  - "0.6"
-  - "0.8"
-  - "0.10"
+- '0.6'
+- '0.8'
+- '0.10'
 env:
   matrix:
-    - BIN="node"
-    - BIN="phantomjs"
+  - BIN="node"
+  - BIN="phantomjs"
+  global:
+  - SAUCE_LABS=false
+  - secure: SHFzZkQEn7wRdNfqVpi/RPRdISS1AYTr5gKTR4wtR1X1x5q/r9Mf1/tXvi2DLuUMl+3O8yuN455229UnwMQiT8ZiDCnq0rTLzZ1nIJJLvMCvvbsMRgJJd+T82JVUA0gZe+AJXbglWo8p6x7TTMVbvwwIbi/yVt0EDaxobFqPGnk=
+  - secure: kFXfRIg/NQnjIkWAFeLyKQNB9inmfCwbpZiqi3n9K+mKGfjZefWX43tJEPtDw//hQPH0QgEoRx9hQy+4dMuuYzKBIYWuDDwdDYhDpGUaamCCSpjX5jUtG5Rz29tM6t9vU6r369eeR2wcENDP4nEdPtCkr5n7el14no60WGPLNK0=
 matrix:
   include:
-    - node_js: "0.10"
-      env: BIN="narwhal"
-    - node_js: "0.10"
-      env: BIN="rhino"
-    - node_js: "0.10"
-      env: BIN="ringo"
+  - node_js: '0.10'
+    env: BIN="narwhal"
+  - node_js: '0.10'
+    env: BIN="rhino"
+  - node_js: '0.10'
+    env: BIN="ringo"
+  - node_js: '0.10'
+    env: BIN="node" SAUCE_LABS=true
 git:
   depth: 10
 branches:
   only:
-    - gh-pages
-    - dev
+  - gh-pages
+  - dev
 before_install:
-  - "[ $BIN == 'istanbul' ] && npm i -g istanbul@\"~0.1.0\" || true"
-  - "[ $BIN == 'narwhal' ] && wget https://github.com/280north/narwhal/archive/v0.3.2.zip && sudo unzip v0.3.2 -d /opt/ && rm v0.3.2.zip || true"
-  - "[ $BIN == 'narwhal' ] && sudo ln -s /opt/narwhal-0.3.2/bin/narwhal /usr/local/bin/narwhal && sudo chmod +x /usr/local/bin/narwhal || true"
-  - "[ $BIN == 'rhino' ] && sudo mkdir /opt/rhino-1.7R5 && sudo wget -O /opt/rhino-1.7R5/js.jar https://oss.sonatype.org/content/repositories/snapshots/org/mozilla/rhino/1.7R5-SNAPSHOT/rhino-1.7R5-20120629.144839-4.jar || true"
-  - "[ $BIN == 'rhino' ] && echo -e '#!/bin/sh\\njava -jar /opt/rhino-1.7R5/js.jar $@' | sudo tee /usr/local/bin/rhino && sudo chmod +x /usr/local/bin/rhino || true"
-  - "[ $BIN == 'ringo' ] && wget http://ringojs.org/downloads/ringojs-0.9.zip && sudo unzip ringojs-0.9 -d /opt && rm ringojs-0.9.zip || true"
-  - "[ $BIN == 'ringo' ] && sudo ln -s /opt/ringojs-0.9/bin/ringo /usr/local/bin/ringo && sudo chmod +x /usr/local/bin/ringo || true"
+- '[ $SAUCE_LABS == false ] || npm i chalk@"^0.4.0" ecstatic@"^0.5.0" request@"^2.34.0" sauce-tunnel@"^2.0.0" lodash@"git://github.com/lodash/lodash.git#a0b006cf90e20a377047119bd2ab1a2d89f0200b"'
+- '[ $BIN == ''istanbul'' ] && npm i -g istanbul@"^0.1.0" || true'
+- '[ $BIN == ''narwhal'' ] && wget https://github.com/280north/narwhal/archive/v0.3.2.zip
+  && sudo unzip v0.3.2 -d /opt/ && rm v0.3.2.zip || true'
+- '[ $BIN == ''narwhal'' ] && sudo ln -s /opt/narwhal-0.3.2/bin/narwhal /usr/local/bin/narwhal
+  && sudo chmod +x /usr/local/bin/narwhal || true'
+- '[ $BIN == ''rhino'' ] && sudo mkdir /opt/rhino-1.7R5 && sudo wget -O /opt/rhino-1.7R5/js.jar
+  https://oss.sonatype.org/content/repositories/snapshots/org/mozilla/rhino/1.7R5-SNAPSHOT/rhino-1.7R5-20120629.144839-4.jar
+  || true'
+- '[ $BIN == ''rhino'' ] && echo -e ''#!/bin/sh\njava -jar /opt/rhino-1.7R5/js.jar
+  $@'' | sudo tee /usr/local/bin/rhino && sudo chmod +x /usr/local/bin/rhino || true'
+- '[ $BIN == ''ringo'' ] && wget http://ringojs.org/downloads/ringojs-0.9.zip && sudo
+  unzip ringojs-0.9 -d /opt && rm ringojs-0.9.zip || true'
+- '[ $BIN == ''ringo'' ] && sudo ln -s /opt/ringojs-0.9/bin/ringo /usr/local/bin/ringo
+  && sudo chmod +x /usr/local/bin/ringo || true'
 install: true
 script:
-  - "[ $BIN != 'istanbul' ] || $BIN cover ./test/test_json3.js"
-  - "[ $BIN == 'istanbul' ] || node build.js"
-  - "[ $BIN == 'istanbul' ] || cd ./test"
-  - "[ $BIN == 'istanbul' ] || $BIN ./test_json3.js"
-  - "[ $BIN == 'istanbul' ] || $BIN ./test_json3.js ../lib/json3.min.js"
+  - '[ $BIN != ''istanbul'' ] || $BIN cover ./test/test_json3.js'
+  - '[ $BIN == ''istanbul'' ] || node build.js'
+  - '[ $BIN == ''istanbul'' ] || cd ./test'
+  - '([ $BIN == ''istanbul'' ] && [ $SAUCE_LABS == true ]) || $BIN ./test_json3.js'
+  - '([ $BIN == ''istanbul'' ]&& [ $SAUCE_LABS == true ]) || $BIN ./test_json3.js ../lib/json3.min.js'
+  - '[ $SAUCE_LABS == false ] || $BIN ./saucelabs.js name="json3 tests" runner="test/test_browser.html?saucelabs=true" tags="development" framework="custom"'
+  - '[ $SAUCE_LABS == false ] || $BIN ./saucelabs.js name="json3 tests" runner="test/test_browser.html?saucelabs=true&minified=true" tags="minified" framework="custom"'

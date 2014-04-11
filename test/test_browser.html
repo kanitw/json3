@@ -27,6 +27,62 @@
     }());
     </script>
     <script>
+    var initSauceLabs = function () {};
+
+    (function () {
+      if (!(typeof Spec == "object" && Spec || typeof Newton == "object" && Newton)) {
+	return;
+      }
+
+      if (queryParams && Spec.hasKey(queryParams, "saucelabs")) {
+	var test_results = {
+	  "passed": 0,
+	  "failed": 0,
+	  "total": 0,
+	  "duration": 0,
+	  "tests": []
+	}, start_time, end_time;
+
+	initSauceLabs = function (testSuite) {
+	  testSuite.on("all", function (event) {
+	    switch (event.type) {
+	      case "start":
+		start_time = new Date();
+		break;
+	      case "assertion":
+		test_results.total++;
+		test_results.passed++;
+		test_results.tests.push({
+		  "name": event.message,
+		  "result": true,
+		  "message": event.message,
+		  "duration": 0
+		});
+		break;
+	      case "failure":
+		test_results.total++;
+		test_results.failed++;
+		test_results.tests.push({
+		  "name": event.message,
+		  "result": false,
+		  "message": event.message,
+		  "duration": 0
+		});
+		break;
+	      case "complete":
+		end_time = new Date();
+		test_results.duration = end_time - start_time;
+		window.global_test_results = test_results;
+		break;
+	      default:
+		break;
+	    }
+	  });
+	};
+      }
+    }());
+    </script>
+    <script>
     var libraryPath, isAMD, addNoConflictTest;
     (function (root) {
       if (!(typeof Spec == "object" && Spec || typeof Newton == "object" && Newton)) {
@@ -92,11 +148,13 @@
             test.equal(JSON3.stringify(1), "1", "JSON 3 should be exported as an asynchronous module");
             test.done(2);
           });
+	  initSauceLabs(testSuite);
           addNoConflictTest(testSuite);
           testSuite.run();
         });
       } else {
         var testSuite = root.JSON3.testSuite;
+	initSauceLabs(testSuite);
         addNoConflictTest(testSuite);
         testSuite.run();
       }
