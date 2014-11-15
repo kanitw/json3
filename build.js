@@ -131,27 +131,6 @@ marked.setOptions({
   }
 });
 
-// Shim `Buffer.concat` for Node.js 0.6
-if (!Buffer.concat) {
-  Buffer.concat = function(list, length) {
-    if (list.length === 0) {
-      return new Buffer(0);
-    } else if (list.length === 1) {
-      return list[0];
-    }
-
-    var buffer = new Buffer(length);
-    var pos = 0;
-    for (var i = 0; i < list.length; i++) {
-      var buf = list[i];
-      buf.copy(buffer, pos);
-      pos += buf.length;
-    }
-
-    return buffer;
-  };
-}
-
 // Generate the GitHub project page.
 fs.readFile(path.join(__dirname, "README.md"), "utf8", function readInfo(exception, source) {
   if (exception) {
