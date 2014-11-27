@@ -1,4 +1,6 @@
-# JSON 3 #
+# JSON 3 (modified with nice stringify) #
+
+Modified by Kanit "Ham" Wongsuphasawat.
 
 ![JSON 3 Logo](https://bestiejs.github.io/json3/page/logo.png)
 
