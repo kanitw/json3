@@ -1,4 +1,4 @@
-# JSON 3 (modified with nice stringify) #
+# JSON 3 (modified with compact stringify) #
 
 Modified by Kanit "Ham" Wongsuphasawat.
 
